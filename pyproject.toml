@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel", "torch>=2.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gdel3d_cuda"
+version = "0.2.0"
+description = "Python binding for gDel3D GPU 3D Delaunay Tetrahedralization"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "KhoiDOO & Antigravity" }]
+requires-python = ">=3.9"
+dependencies = ["torch>=2.0.0"]

@@ -74,8 +74,11 @@ GpuDel::~GpuDel()
 
 void GpuDel::compute( const Point3HVec& pointVec, GDelOutput *output )
 {
-    // Set L1 for kernels
-    CudaSafeCall( cudaDeviceSetCacheConfig( cudaFuncCachePreferL1 ) );
+    // Set L1 for kernels (graceful check for modern CUDA architectures like Blackwell)
+    cudaError_t cacheErr = cudaDeviceSetCacheConfig( cudaFuncCachePreferL1 );
+    if ( cacheErr != cudaSuccess ) {
+        cudaGetLastError(); // Clear error state on modern architectures
+    }
 
     _output = output;
     _output->stats.reset(); 
@@ -374,7 +377,8 @@ void GpuDel::expandTetraList( int newTetNum )
         if ( growNum > newTetNum ) 
             growNum = newTetNum; 
 
-        std::cout << "Expanding tetra to: " << growNum << std::endl;
+        if ( _params.verbose )
+            std::cout << "Expanding tetra to: " << growNum << std::endl;
 
         _tetVec.grow( growNum ); 
         _oppVec.grow( growNum ); 

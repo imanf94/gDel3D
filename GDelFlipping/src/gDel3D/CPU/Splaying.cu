@@ -530,7 +530,7 @@ void Splaying::starsToTetra()
 
                 tetInStar[ vi ]  = triIdx; 
 
-                if ( toStar->_tetIdxVec[ triIdx ] != -1 ) 
+                if ( triIdx != -1 && toStar->_tetIdxVec[ triIdx ] != -1 ) 
                     tetIdx = toStar->_tetIdxVec[ triIdx ]; 
             }
 
@@ -551,8 +551,10 @@ void Splaying::starsToTetra()
            
             star->_tetIdxVec[ triIdx ] = tetIdx;
 
-            for ( int vi = 0; vi < 3; ++vi ) 
-                _starVec[ tri._v[ vi ] ]->_tetIdxVec[ tetInStar[ vi ] ] = tetIdx; 
+            for ( int vi = 0; vi < 3; ++vi ) {
+                if ( tetInStar[ vi ] != -1 )
+                    _starVec[ tri._v[ vi ] ]->_tetIdxVec[ tetInStar[ vi ] ] = tetIdx; 
+            }
 
             // Set opp in 3 neighbours
             const TriOpp triOpp = star->_triOppVec[ triIdx ];
@@ -562,6 +564,7 @@ void Splaying::starsToTetra()
             for ( int vi = 0; vi < 3; ++vi )
             {
                 const int oppTriIdx    = triOpp.getOppTri( vi );
+                if ( -1 == oppTriIdx ) continue;
                 const int oppTriVi     = triOpp.getOppVi( vi );
                 const int oppTriTetIdx = star->_tetIdxVec[ oppTriIdx ];
 
@@ -579,19 +582,24 @@ void Splaying::starsToTetra()
                 // Set both ways
                 TetOpp& oppTetOpp = (*_oppVec)[ oppTriTetIdx ];
 
-                tetOpp.setOpp( curTetVi, oppTriTetIdx, oppTetVi );
-                oppTetOpp.setOpp( oppTetVi, tetIdx, curTetVi );
+                if ( curTetVi != -1 && oppTetVi != -1 ) {
+                    tetOpp.setOpp( curTetVi, oppTriTetIdx, oppTetVi );
+                    oppTetOpp.setOpp( oppTetVi, tetIdx, curTetVi );
+                }
             }
 
             // Set opp in 4th neighbour
 
             const Star* star2 = _starVec[ tri._v[0] ];
             const int triIdx2 = tetInStar[ 0 ]; 
+            if ( -1 == triIdx2 ) continue;
             const int tetIdx2 = star2->_tetIdxVec[ triIdx2 ];
+            if ( -1 == tetIdx2 ) continue;
 
             const int vi2           = star2->_triVec[ triIdx2 ].indexOf( vert );
             const TriOpp triOpp2    = star2->_triOppVec[ triIdx2 ];
             const int oppTriIdx2    = triOpp2.getOppTri( vi2 );
+            if ( -1 == oppTriIdx2 ) continue;
             const int oppTriVi2     = triOpp2.getOppVi( vi2 );
             const int oppTriTetIdx2 = star2->_tetIdxVec[ oppTriIdx2 ];
 
@@ -601,11 +609,12 @@ void Splaying::starsToTetra()
             const int oppTetVi = (*_tetVec)[ oppTriTetIdx2 ].getIndexOf( oppVert );
             const int curTetVi = tet.getIndexOf( vert );
 
-            // Set both ways
-            TetOpp& oppTetOpp2 = (*_oppVec)[ oppTriTetIdx2 ];
+            if ( curTetVi != -1 && oppTetVi != -1 ) {
+                TetOpp& oppTetOpp2 = (*_oppVec)[ oppTriTetIdx2 ];
 
-            tetOpp.setOpp( curTetVi, oppTriTetIdx2, oppTetVi );
-            oppTetOpp2.setOpp( oppTetVi, tetIdx, curTetVi );
+                tetOpp.setOpp( curTetVi, oppTriTetIdx2, oppTetVi );
+                oppTetOpp2.setOpp( oppTetVi, tetIdx, curTetVi );
+            }
         }
     }
 

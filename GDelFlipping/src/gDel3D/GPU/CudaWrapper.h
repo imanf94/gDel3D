@@ -121,7 +121,7 @@ void cuDelete( T** loc )
 }
 
 template< typename T >
-__forceinline__ __device__ void cuSwap( T& v0, T& v1 )
+__forceinline__ __host__ __device__ void cuSwap( T& v0, T& v1 )
 {
     const T tmp = v0;
     v0          = v1;

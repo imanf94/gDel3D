@@ -144,7 +144,7 @@ __forceinline__ __device__ float hash( int k )
     k ^= k >> 31;
     k ^= k << 31;
 
-    return int_as_float( k ); 
+    return __int_as_float( k ); 
 }
 
 __global__ void
